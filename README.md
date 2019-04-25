@@ -8,7 +8,32 @@ A simple program that takes expressions like `5 + 8 * (7-1)` and parses them int
 
 ```bash
 ./run.sh # equivalent to `$cargo run -- <expr_to_evaluate>'
+# Output:
+#[
+#    [
+#        [
+#            [
+#                Literal -> 18 (depth=0),
+#                Literal -> 29 (depth=0)
+#            ], is Sum (depth=1)
+#        ], is Paren (depth=2),
+#        [
+#            Literal -> 50 (depth=0),
+#            Literal -> 611 (depth=0)
+#        ], is Mult (depth=1)
+#    ], is Div (depth=3),
+#    [
+#        Literal -> 41 (depth=0),
+#        Literal -> 12 (depth=0)
+#    ], is Exp (depth=1)
+#], is Sum (depth=4)
+
 ./run.sh err1 # demonstrates an error; `err2' and `err3' exist, too
+# Output:
+#Token 3: Unexpected character `s'.
+#        2123^sdkfj(141+22-(5998)-142
+#        -----^
+
 ```
 
 ## License
