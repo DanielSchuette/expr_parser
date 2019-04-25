@@ -6,11 +6,14 @@
  */
 mod lexer;
 mod parser;
+mod utils;
+mod vm;
 
-use lexer::{lex, Token};
-use parser::{parse, ParserError};
+use lexer::lex;
+use parser::parse;
 use std::env;
 use std::process::exit;
+use utils::exit_with_err;
 
 fn main() {
     // collect 2 command line arguments or exit
@@ -24,43 +27,20 @@ fn main() {
     // FIXME: handle errors inbetween lexing and parsing instead of delegating
     //        things to `parse'. This involves calling `exit_with_err' when
     //        appropriate.
+    //        Ultimately, the VM should handle dynamic user input and calling
+    //        `lex' and `parse'. The user might indicate execution of a cli-
+    //        provided expression via a flag and `vm::run' is handed a config
+    //        struct with an appropriate bit field set. Other solutions are
+    //        possible, too.
     let tokens = lex(&args[1]);
     let res = parse(tokens);
 
     if let Ok(ast) = res {
-        println!("{:#?}", ast);
+        if utils::DEBUG {
+            println!("{:#?}", ast);
+        }
+        vm::run(ast);
     } else if let Err(e) = res {
         exit_with_err(e, &args[1]);
     }
-}
-
-fn exit_with_err(err: ParserError, input: &String) {
-    // report the error back to the user
-    println!("Token {}: {}.", err.token_no, err.msg);
-    println!("\t{}", input);
-
-    // print an indicator where in the input the error happened
-    if err.lexer.len() != 0 {
-        let indicator = "-".repeat(get_position(err.lexer));
-        println!("\t{}^", indicator);
-    } else {
-        let indicator = "-".repeat(input.to_string().len() - 1);
-        println!("\t{}^", indicator);
-    }
-    exit(1);
-}
-
-fn get_position(vec: Vec<Token>) -> usize {
-    let mut pos = 0;
-    for token in vec {
-        match token {
-            Token::Number(n) => {
-                pos += n.to_string().len();
-            }
-            _ => {
-                pos += 1;
-            }
-        }
-    }
-    pos
 }
