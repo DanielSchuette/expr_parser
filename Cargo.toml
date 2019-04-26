@@ -8,7 +8,7 @@ license = "MIT"
 license-file = "./LICENSE.md"
 repository = "https://github.com/DanielSchuette/expr_parser"
 readme = "./README.md"
-keywords = ["parser", "lexer", "ast", "cfg", "interpreter", "vm"]
+keywords = ["parser", "lexer", "ast", "interpreter", "vm"]
 
 [dependencies]
 clap = "2.32"
