@@ -36,5 +36,8 @@ A simple program that takes expressions like `5 + 8 * (7-1)` and parses them int
 
 ```
 
+## Create an AST Graph
+`graphviz` must be installed on your system. If you execute `./run.sh`, a PDF file will be created in `./graph/`.
+
 ## License
 The code in this repository is MIT-licensed (see [LICENSE.md](./LICENSE.md)).
