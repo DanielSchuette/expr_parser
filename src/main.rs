@@ -32,7 +32,7 @@ fn main() {
             println!("{:#?}", ast);
         }
         if configs.make_graph {
-            utils::draw(&ast, "graph/tree.gv", true);
+            utils::draw(&ast, &configs.graph_file, true);
         }
         vm::run(ast);
     } else if let Err(e) = res {

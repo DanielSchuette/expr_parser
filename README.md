@@ -7,7 +7,8 @@ A simple program that takes expressions like `5 + 8 * (7-1)` and parses them int
 `run.sh` makes running the code in this repository easy:
 
 ```bash
-./run.sh # equivalent to `$cargo run -- <expr_to_evaluate>'
+make
+make test # equivalent to `$cargo run -- <expr_to_evaluate>'
 # Output:
 #[
 #    [
@@ -28,7 +29,7 @@ A simple program that takes expressions like `5 + 8 * (7-1)` and parses them int
 #    ], is Exp (depth=1)
 #], is Sum (depth=4)
 
-./run.sh err1 # demonstrates an error; `err2' and `err3' exist, too
+make err1 # demonstrates an error; `err2' and `err3' exist, too
 # Output:
 #Token 3: Unexpected character `s'.
 #        2123^sdkfj(141+22-(5998)-142
@@ -37,7 +38,7 @@ A simple program that takes expressions like `5 + 8 * (7-1)` and parses them int
 ```
 
 ## Create an AST Graph
-`graphviz` must be installed on your system. If you execute `./run.sh`, a PDF file will be created in `./graph/`.
+`graphviz` must be installed on your system. If you `make` and `make test`, `.gv` and `.pdf` files will be created in the project root.
 
 ## License
 The code in this repository is MIT-licensed (see [LICENSE.md](./LICENSE.md)).

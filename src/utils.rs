@@ -10,7 +10,8 @@ use std::process::exit;
 pub struct Config {
     pub expression: String,
     pub is_debug: bool,
-    pub make_graph: bool, // pub graph_path: String, /* TODO: not yet implemented. */
+    pub make_graph: bool,
+    pub graph_file: String,
 }
 
 pub fn get_configs() -> Config {
@@ -24,16 +25,21 @@ pub fn get_configs() -> Config {
                                                          .help("The expression to evaluate")
                                                          .takes_value(true)
                                                          .required(true))
-                              .arg(Arg::with_name("GRAPH").short("g")
-                                                          .long("graph")
-                                                          .help("Create an AST graph")
-                                                          .takes_value(false)
-                                                          .required(false))
                               .arg(Arg::with_name("DEBUG").short("d")
                                                           .long("debug")
                                                           .help("Debug mode (off by default)")
                                                           .takes_value(false)
                                                           .required(false))
+                              .arg(Arg::with_name("GRAPH").short("g")
+                                                          .long("graph")
+                                                          .help("Create an AST graph")
+                                                          .takes_value(false)
+                                                          .required(false))
+                              .arg(Arg::with_name("G_FILE").short("f")
+                                                           .long("graph_file")
+                                                           .help("File to save the graph to")
+                                                           .takes_value(true)
+                                                           .required(false))
                               .get_matches();
 
     // extract arguments and return config struct for main to use
@@ -48,9 +54,15 @@ pub fn get_configs() -> Config {
     } else {
         false
     };
+    let graph_file = if cli_args.is_present("G_FILE") {
+        cli_args.value_of("G_FILE").unwrap().to_string()
+    } else {
+        String::from("")
+    };
     Config { expression,
              is_debug,
-             make_graph }
+             make_graph,
+             graph_file }
 }
 
 pub fn exit_with_err(err: ParserError, input: &String) {
