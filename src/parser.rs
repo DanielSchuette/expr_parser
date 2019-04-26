@@ -3,7 +3,7 @@ use crate::lexer;
 use lexer::*;
 use std::fmt;
 
-// Language symbols are either terminals or non-terminals.
+/* Language symbols are either terminals or non-terminals. */
 #[derive(Debug)]
 enum Symbol {
     Terminal(Terminal),
@@ -31,7 +31,7 @@ enum Terminal {
     Literal(i64),
 }
 
-// An expression is parsed into a `ParseNode'.
+/* An expression is parsed into a `ParseNode'. */
 pub struct ParseNode {
     children: Vec<ParseNode>, /* len==0 for terminals */
     kind: Symbol,             /* type of this node in the AST */
@@ -101,8 +101,10 @@ impl fmt::Debug for ParseNode {
     }
 }
 
-// A generic error type that is used by the parser and holds a message and the
-// token at which the error occured.
+/*
+ * A generic error type that is used by the parser and holds a message and the
+ * token at which the error occured.
+ */
 pub struct ParserError {
     pub msg: String,
     pub token_no: usize,
@@ -135,8 +137,10 @@ pub fn parse(tokens: Result<Vec<Token>, LexerError>)
     }
 }
 
-// Everything is an expression, so parsing starts here.
-// FIXME: replace repetition in match arm bodies with macro.
+/*
+ * Everything is an expression, so parsing starts here. FIXME: replace
+ * repetition in match arm bodies with macro.
+ */
 fn parse_expr(tokens: &Vec<Token>, pos: usize)
               -> Result<(ParseNode, usize), ParserError> {
     let (lhs, pos) = parse_term(tokens, pos)?;
@@ -173,7 +177,7 @@ fn parse_expr(tokens: &Vec<Token>, pos: usize)
     }
 }
 
-// An expression consists of terms, so they are parsed next.
+/* An expression consists of terms, so they are parsed next. */
 fn parse_term(tokens: &Vec<Token>, pos: usize)
               -> Result<(ParseNode, usize), ParserError> {
     let (lhs, pos) = parse_factor(tokens, pos)?;
@@ -199,6 +203,7 @@ fn parse_term(tokens: &Vec<Token>, pos: usize)
     }
 }
 
+/* Term consist of factors, which are parsed by this function. */
 fn parse_factor(tokens: &Vec<Token>, pos: usize)
                 -> Result<(ParseNode, usize), ParserError> {
     let (lhs, pos) = parse_exponent(tokens, pos)?;
@@ -216,6 +221,11 @@ fn parse_factor(tokens: &Vec<Token>, pos: usize)
     }
 }
 
+/*
+ * Lastly, exponents are parsed. If parentheses are encountered, start with
+ * parsing an expression again. If a literal is found, no more recursion is
+ * done because literals are parse tree terminals.
+ */
 fn parse_exponent(tokens: &Vec<Token>, pos: usize)
                   -> Result<(ParseNode, usize), ParserError> {
     let c: &Token =

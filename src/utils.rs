@@ -14,6 +14,7 @@ pub struct Config {
     pub graph_file: String,
 }
 
+/* Parse CLi arguments and return them, wrapped in a `Config' struct. */
 pub fn get_configs() -> Config {
     // define cli arguments using clap
     let cli_args =
@@ -24,7 +25,7 @@ pub fn get_configs() -> Config {
                                                          .long("expression")
                                                          .help("The expression to evaluate")
                                                          .takes_value(true)
-                                                         .required(true))
+                                                         .required(false))
                               .arg(Arg::with_name("DEBUG").short("d")
                                                           .long("debug")
                                                           .help("Debug mode (off by default)")
@@ -43,28 +44,40 @@ pub fn get_configs() -> Config {
                               .get_matches();
 
     // extract arguments and return config struct for main to use
-    let expression = cli_args.value_of("EXPR").unwrap().to_string();
+    let expression = if cli_args.is_present("EXPR") {
+        cli_args.value_of("EXPR").unwrap().to_string()
+    } else {
+        String::from("")
+    };
+
     let is_debug = if cli_args.is_present("DEBUG") {
         true
     } else {
         false
     };
+
     let make_graph = if cli_args.is_present("GRAPH") {
         true
     } else {
         false
     };
+
     let graph_file = if cli_args.is_present("G_FILE") {
         cli_args.value_of("G_FILE").unwrap().to_string()
     } else {
         String::from("")
     };
+
     Config { expression,
              is_debug,
              make_graph,
              graph_file }
 }
 
+/*
+ * Prints a helpful error msg, based on the `ParserError' and the user `input'
+ * and exits with a status of 1.
+ */
 pub fn exit_with_err(err: ParserError, input: &String) {
     // report the error back to the user
     println!("Token {}: {}.", err.token_no, err.msg);
@@ -96,7 +109,7 @@ fn get_position(vec: Vec<Token>) -> usize {
     pos
 }
 
-// A thin wrapper around `create_graph' from the `draw' crate.
+/* A thin wrapper around `create_graph' from the `draw' crate. */
 pub fn draw(ast: &ParseNode, path: &str, pdf: bool) {
     let res = draw::create_graph(&ast, path, pdf);
     match res {

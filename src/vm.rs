@@ -2,9 +2,10 @@
 use crate::parser::ParseNode;
 use std::io::{stdin, stdout, Write};
 
-pub fn run(_tree_root: ParseNode) {
+/* Run the virtual machine, including interpreter loop & lexing & parsing. */
+pub fn run() {
     loop {
-        let input = prompt_and_read(String::from("> "));
+        let input = prompt_and_read("> ");
         println!("{}", input);
         if input == "exit" {
             return;
@@ -12,9 +13,13 @@ pub fn run(_tree_root: ParseNode) {
     }
 }
 
-// Print a prompt, read from standard input and return with new lines trimmed
-// off.
-fn prompt_and_read(ps1: String) -> String {
+/* Evaluate an expression, represented by an abstract syntax tree. */
+pub fn evaluate(_tree_root: &ParseNode) -> i64 {
+    0
+}
+
+/* Print a prompt, read from `stdin' and return with new lines trimmed off. */
+fn prompt_and_read(ps1: &str) -> String {
     print!("{}", ps1);
     stdout().flush().expect("Failed to flush stdout");
     let mut input = String::new();

@@ -1,7 +1,7 @@
 /* lexer.rs: The lexer. */
 use std::iter::Peekable;
 
-// Lexing can return these tokens.
+/* Lexing can return these tokens. */
 #[derive(Debug, Clone)]
 pub enum Token {
     OpAdd,      /* + */
@@ -15,16 +15,18 @@ pub enum Token {
     Number(i64),
 }
 
-// A generic error type that is used by the lexer and holds a message and the
-// token at which the error occured. A vector of tokens up to the error is
-// included for better error reporting.
+/*
+ * A generic error type that is used by the lexer and holds a message and the
+ * token at which the error occured. A vector of tokens up to the error is
+ * included for better error reporting.
+ */
 pub struct LexerError {
     pub msg: String,
     pub token_no: usize,
     pub tokens: Vec<Token>, /* tokens up to the error */
 }
 
-// The lexer which emits a token stream or an error.
+/* The lexer which emits a token stream or an error. */
 pub fn lex(input: &String) -> Result<Vec<Token>, LexerError> {
     let mut progress = 0;
     let mut result = vec![];

@@ -15,5 +15,13 @@ make err1 # demonstrates an error; `err2' and `err3' exist, too
 ## Create an AST Graph
 `graphviz` must be installed on your system. If you `make` and `make test`, `.gv` and `.pdf` files will be created in the project root. Refer to the `Makefile` or run `make help` for available parameters.
 
+
+## To-Do:
+1. execute AST via the vm's `evaluate` function
+1. add additional ops to the grammar, e.g. `[]`, `log2`, `log10`
+1. test parser using QuickCheck or something similar
+1. allow for dynamic user input
+1. allow for variable assignment and re-use of those variables (`$var` syntax), using a stack machine
+
 ## License
 The code in this repository is MIT-licensed (see [LICENSE.md](./LICENSE.md)).
