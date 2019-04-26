@@ -1,9 +1,19 @@
 /* utils.rs: Utility functions used by the main interpreter loop. */
 use crate::lexer::Token;
 use crate::parser::ParserError;
+use std::env::Args;
 use std::process::exit;
 
 pub const DEBUG: bool = true;
+
+pub fn get_expr(args: Args) -> String {
+    let args: Vec<String> = args.collect();
+    if args.len() != 2 {
+        println!("Error: need exactly two arguments.");
+        exit(1);
+    }
+    args[1].clone()
+}
 
 pub fn exit_with_err(err: ParserError, input: &String) {
     // report the error back to the user

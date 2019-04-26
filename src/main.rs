@@ -11,17 +11,11 @@ mod vm;
 
 use lexer::lex;
 use parser::parse;
-use std::env;
-use std::process::exit;
-use utils::exit_with_err;
+use std::env::args;
+use utils::{exit_with_err, get_expr};
 
 fn main() {
-    // collect 2 command line arguments or exit
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        println!("Error: need exactly two arguments.");
-        exit(1);
-    }
+    let expr = get_expr(args());
 
     // lex and parse the user input and report the result
     // FIXME: handle errors inbetween lexing and parsing instead of delegating
@@ -32,7 +26,7 @@ fn main() {
     //        provided expression via a flag and `vm::run' is handed a config
     //        struct with an appropriate bit field set. Other solutions are
     //        possible, too.
-    let tokens = lex(&args[1]);
+    let tokens = lex(&expr);
     let res = parse(tokens);
 
     if let Ok(ast) = res {
@@ -41,6 +35,6 @@ fn main() {
         }
         vm::run(ast);
     } else if let Err(e) = res {
-        exit_with_err(e, &args[1]);
+        exit_with_err(e, &expr);
     }
 }
