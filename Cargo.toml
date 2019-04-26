@@ -5,3 +5,4 @@ authors = ["DanielSchuette <d.schuette@online.de>"]
 edition = "2018"
 
 [dependencies]
+clap = "2.32"

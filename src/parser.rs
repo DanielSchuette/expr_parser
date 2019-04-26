@@ -44,6 +44,39 @@ impl ParseNode {
                     kind,
                     depth }
     }
+    pub fn get_children(&self) -> &Vec<ParseNode> {
+        &self.children
+    }
+
+    pub fn get_long_type(&self) -> String {
+        match self.kind {
+            Symbol::Terminal(Terminal::Literal(n)) => format!("Literal={}", n),
+            Symbol::NonTerminal(NonTerminal::Sum) => format!("Op=PLUS"),
+            Symbol::NonTerminal(NonTerminal::Sub) => format!("Op=MINUS"),
+            Symbol::NonTerminal(NonTerminal::Mod) => format!("Op=MODULP"),
+            Symbol::NonTerminal(NonTerminal::Mult) => format!("Op=MULTIPLICATION"),
+            Symbol::NonTerminal(NonTerminal::Div) => format!("Op=DIVISON"),
+            Symbol::NonTerminal(NonTerminal::Exp) => format!("Op=EXPONENTIATION"),
+            Symbol::NonTerminal(NonTerminal::Paren) => format!("Parentheses"),
+        }
+    }
+
+    pub fn get_short_type(&self) -> String {
+        match self.kind {
+            Symbol::Terminal(Terminal::Literal(n)) => format!("{}", n),
+            Symbol::NonTerminal(NonTerminal::Sum) => format!("+"),
+            Symbol::NonTerminal(NonTerminal::Sub) => format!("-"),
+            Symbol::NonTerminal(NonTerminal::Mod) => format!("%"),
+            Symbol::NonTerminal(NonTerminal::Mult) => format!("*"),
+            Symbol::NonTerminal(NonTerminal::Div) => format!("/"),
+            Symbol::NonTerminal(NonTerminal::Exp) => format!("^"),
+            Symbol::NonTerminal(NonTerminal::Paren) => format!("(...)"),
+        }
+    }
+
+    pub fn get_depth(&self) -> usize {
+        self.depth
+    }
 }
 
 impl fmt::Debug for ParseNode {

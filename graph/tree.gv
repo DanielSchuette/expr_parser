@@ -1,0 +1,27 @@
+graph {
+	"id=Op=PLUS_4" -- "id=Op=DIVISON_3" -- 	"id=Parentheses_2" -- "id=Op=PLUS_1" -- "id=Literal=18_0"
+	"id=Op=PLUS_1" -- "id=Literal=29_0"
+	"id=Op=DIVISON_3" -- "id=Op=MULTIPLICATION_1" -- "id=Literal=50_0"
+	"id=Op=MULTIPLICATION_1" -- "id=Literal=611_0"
+	"id=Op=PLUS_4" -- "id=Op=EXPONENTIATION_1" -- "id=Literal=41_0"
+	"id=Op=EXPONENTIATION_1" -- "id=Literal=12_0"
+	{
+		"id=Op=PLUS_4" [label = "+"]
+		"id=Op=DIVISON_3" [label = "/"]
+		"id=Parentheses_2" [label = "(...)"]
+		"id=Op=PLUS_1" [label = "+"]
+		"id=Literal=18_0" [label = "18"]
+		"id=Op=PLUS_1" [label = "+"]
+		"id=Literal=29_0" [label = "29"]
+		"id=Op=DIVISON_3" [label = "/"]
+		"id=Op=MULTIPLICATION_1" [label = "*"]
+		"id=Literal=50_0" [label = "50"]
+		"id=Op=MULTIPLICATION_1" [label = "*"]
+		"id=Literal=611_0" [label = "611"]
+		"id=Op=PLUS_4" [label = "+"]
+		"id=Op=EXPONENTIATION_1" [label = "^"]
+		"id=Literal=41_0" [label = "41"]
+		"id=Op=EXPONENTIATION_1" [label = "^"]
+		"id=Literal=12_0" [label = "12"]
+	}
+}
