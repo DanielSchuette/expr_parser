@@ -1,103 +1,107 @@
 /* parser.rs: The parser. */
 use crate::lexer;
 use lexer::*;
-use std::fmt;
-
-/* Language symbols are either terminals or non-terminals. */
-#[derive(Debug)]
-enum Symbol {
-    Terminal(Terminal),
-    NonTerminal(NonTerminal),
-}
 
 /*
- * Every symbol in the language except for integer literals are non-terminals.
- * They appear as `ParseNode.kind' in the syntax tree. Leaves of the tree only
- * store the corresponding terminal with its `i64' value.
+ * Every symbol in the language except for integer literals and operators is a
+ * non-terminals. They appear as `ParseNode.kind' in the syntax tree. Leaf
+ * nodes of the tree only store the corresponding terminal with its `i64' value
+ * while branch nodes store their non-terminal, too.
  */
 #[derive(Debug)]
 enum NonTerminal {
-    Sum,   /* summation */
-    Sub,   /* subtraction */
-    Mod,   /* modulo */
-    Mult,  /* multiplication */
-    Div,   /* divison */
-    Exp,   /* exponentiation */
-    Paren, /* parenthesis */
+    Expression, /* precedence 0 (lowest) */
+    Term,       /* precedence 1 */
+    Factor,     /* precedence 2 */
+    Exponent,   /* precedence 3 (highest ) */
 }
 
 #[derive(Debug)]
 enum Terminal {
-    Literal(i64),
+    Sum,          /* summation */
+    Sub,          /* subtraction */
+    Mod,          /* modulo */
+    Mult,         /* multiplication */
+    Div,          /* divison */
+    Exp,          /* exponentiation */
+    Paren,        /* parenthesis */
+    Literal(i64), /* literals are stored with their associated values */
+}
+
+#[derive(Debug)]
+enum NodeType {
+    Root,
+    Branch,
+    Leaf,
 }
 
 /* An expression is parsed into a `ParseNode'. */
+#[derive(Debug)]
 pub struct ParseNode {
-    children: Vec<ParseNode>, /* len==0 for terminals */
-    kind: Symbol,             /* type of this node in the AST */
-    depth: usize,             /* depth of this node (leaf=0) */
+    left_child: Option<Box<ParseNode>>, /* `None' for terminals */
+    right_child: Option<Box<ParseNode>>, /* `None' for terminals & parens */
+    ntype: NodeType,                    /* type of this node in the AST */
+    terminal: Terminal,                 /* */
+    non_terminal: NonTerminal,          /* `IsTerminal' for terminals */
+    depth: usize,                       /* depth of this node (leaf=0) */
 }
 
 impl ParseNode {
-    fn new(kind: Symbol, depth: usize) -> ParseNode {
-        ParseNode { children: Vec::new(),
-                    kind,
+    fn new(ntype: NodeType, terminal: Terminal, non_terminal: NonTerminal,
+           depth: usize)
+           -> ParseNode {
+        ParseNode { left_child: None,
+                    right_child: None,
+                    ntype,
+                    terminal,
+                    non_terminal,
                     depth }
     }
-    pub fn get_children(&self) -> &Vec<ParseNode> {
-        &self.children
+    pub fn get_lchild(&self) -> &Option<Box<ParseNode>> {
+        &self.left_child
+    }
+
+    pub fn get_rchild(&self) -> &Option<Box<ParseNode>> {
+        &self.right_child
     }
 
     pub fn get_long_type(&self) -> String {
-        match self.kind {
-            Symbol::Terminal(Terminal::Literal(n)) => format!("Literal={}", n),
-            Symbol::NonTerminal(NonTerminal::Sum) => format!("Op=PLUS"),
-            Symbol::NonTerminal(NonTerminal::Sub) => format!("Op=MINUS"),
-            Symbol::NonTerminal(NonTerminal::Mod) => format!("Op=MODULP"),
-            Symbol::NonTerminal(NonTerminal::Mult) => format!("Op=MULTIPLICATION"),
-            Symbol::NonTerminal(NonTerminal::Div) => format!("Op=DIVISON"),
-            Symbol::NonTerminal(NonTerminal::Exp) => format!("Op=EXPONENTIATION"),
-            Symbol::NonTerminal(NonTerminal::Paren) => format!("Parentheses"),
+        match self.terminal {
+            Terminal::Literal(n) => format!("Literal={}", n),
+            Terminal::Sum => format!("Op=PLUS"),
+            Terminal::Sub => format!("Op=MINUS"),
+            Terminal::Mod => format!("Op=MODULP"),
+            Terminal::Mult => format!("Op=MULTIPLICATION"),
+            Terminal::Div => format!("Op=DIVISON"),
+            Terminal::Exp => format!("Op=EXPONENTIATION"),
+            Terminal::Paren => format!("Parentheses"),
         }
     }
 
     pub fn get_short_type(&self) -> String {
-        match self.kind {
-            Symbol::Terminal(Terminal::Literal(n)) => format!("{}", n),
-            Symbol::NonTerminal(NonTerminal::Sum) => format!("+"),
-            Symbol::NonTerminal(NonTerminal::Sub) => format!("-"),
-            Symbol::NonTerminal(NonTerminal::Mod) => format!("%"),
-            Symbol::NonTerminal(NonTerminal::Mult) => format!("*"),
-            Symbol::NonTerminal(NonTerminal::Div) => format!("/"),
-            Symbol::NonTerminal(NonTerminal::Exp) => format!("^"),
-            Symbol::NonTerminal(NonTerminal::Paren) => format!("(...)"),
+        match self.terminal {
+            Terminal::Literal(n) => format!("{}", n),
+            Terminal::Sum => format!("+"),
+            Terminal::Sub => format!("-"),
+            Terminal::Mod => format!("%"),
+            Terminal::Mult => format!("*"),
+            Terminal::Div => format!("/"),
+            Terminal::Exp => format!("^"),
+            Terminal::Paren => format!("(...)"),
+        }
+    }
+
+    pub fn get_non_terminal_type(&self) -> String {
+        match self.non_terminal {
+            NonTerminal::Expression => format!("Expression"),
+            NonTerminal::Term => format!("Term"),
+            NonTerminal::Factor => format!("Factor"),
+            NonTerminal::Exponent => format!("Exponent"),
         }
     }
 
     pub fn get_depth(&self) -> usize {
         self.depth
-    }
-}
-
-impl fmt::Debug for ParseNode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.children.len() != 0 {
-            // this is a node
-            if let Symbol::NonTerminal(ref nt) = self.kind {
-                write!(f,
-                       "{:#?}, is {:?} (depth={})",
-                       self.children, nt, self.depth)
-            } else {
-                write!(f, "{:#?}, is {:?}", self.children, self.kind)
-            }
-        } else {
-            // this is a terminal
-            if let Symbol::Terminal(Terminal::Literal(n)) = self.kind {
-                write!(f, "Literal -> {:?} (depth={})", n, self.depth)
-            } else {
-                write!(f, "{:?}", self.kind)
-            }
-        }
     }
 }
 
@@ -119,14 +123,16 @@ pub fn parse(tokens: Result<Vec<Token>, LexerError>)
              -> Result<ParseNode, ParserError> {
     match tokens {
         Ok(tokens) => {
-            parse_expr(&tokens, 0).and_then(|(n, i)| {
-                // check if all tokens were consumed
-                if i == tokens.len() {
-                    Ok(n)
+            parse_expr(&tokens, 0).and_then(|(mut node, pos)| {
+                // check if all tokens were consumed and append the parsing
+                // result to a root node
+                if pos == tokens.len() {
+                    node.ntype = NodeType::Root;
+                    Ok(node)
                 } else {
                     Err(ParserError { msg: format!("Expected end of input, found {:?}",
-                                                   tokens[i]),
-                                      token_no: i,
+                                                   tokens[pos]),
+                                      token_no: pos,
                                       lexer: vec![]})
                 }
             })
@@ -138,8 +144,7 @@ pub fn parse(tokens: Result<Vec<Token>, LexerError>)
 }
 
 /*
- * Everything is an expression, so parsing starts here. FIXME: replace
- * repetition in match arm bodies with macro.
+ * Everything is an expression, so parsing starts here.
  */
 fn parse_expr(tokens: &Vec<Token>, pos: usize)
               -> Result<(ParseNode, usize), ParserError> {
@@ -148,29 +153,36 @@ fn parse_expr(tokens: &Vec<Token>, pos: usize)
     match c {
         // if the token after the term is `%', `+' or `-', parse the RHS expr
         Some(&Token::OpAdd) => {
-            let mut sum =
-                ParseNode::new(Symbol::NonTerminal(NonTerminal::Sum), lhs.depth + 1);
-            sum.children.push(lhs);
+            let mut sum = ParseNode::new(NodeType::Branch,
+                                         Terminal::Sum,
+                                         NonTerminal::Expression,
+                                         lhs.depth + 1);
             let (rhs, pos) = parse_expr(tokens, pos + 1)?;
-            sum.children.push(rhs);
+            sum.left_child = Some(Box::new(lhs));
+            sum.right_child = Some(Box::new(rhs));
             Ok((sum, pos))
         }
         Some(&Token::OpSub) => {
-            let mut sub =
-                ParseNode::new(Symbol::NonTerminal(NonTerminal::Sub), lhs.depth + 1);
-            sub.children.push(lhs);
+            let mut sub = ParseNode::new(NodeType::Branch,
+                                         Terminal::Sub,
+                                         NonTerminal::Expression,
+                                         lhs.depth + 1);
             let (rhs, pos) = parse_expr(tokens, pos + 1)?;
-            sub.children.push(rhs);
+            sub.left_child = Some(Box::new(lhs));
+            sub.right_child = Some(Box::new(rhs));
             Ok((sub, pos))
         }
         Some(&Token::OpMod) => {
-            let mut md =
-                ParseNode::new(Symbol::NonTerminal(NonTerminal::Mod), lhs.depth + 1);
-            md.children.push(lhs);
+            let mut md = ParseNode::new(NodeType::Branch,
+                                        Terminal::Mod,
+                                        NonTerminal::Expression,
+                                        lhs.depth + 1);
             let (rhs, pos) = parse_expr(tokens, pos + 1)?;
-            md.children.push(rhs);
+            md.left_child = Some(Box::new(lhs));
+            md.right_child = Some(Box::new(rhs));
             Ok((md, pos))
         }
+
         // otherwise, the expression is just a single term (recursion stops
         // here eventually)
         _ => Ok((lhs, pos)),
@@ -184,19 +196,23 @@ fn parse_term(tokens: &Vec<Token>, pos: usize)
     let c = tokens.get(pos);
     match c {
         Some(&Token::OpMult) => {
-            let mut mult = ParseNode::new(Symbol::NonTerminal(NonTerminal::Mult),
+            let mut mult = ParseNode::new(NodeType::Branch,
+                                          Terminal::Mult,
+                                          NonTerminal::Term,
                                           lhs.depth + 1);
-            mult.children.push(lhs);
             let (rhs, pos) = parse_term(tokens, pos + 1)?;
-            mult.children.push(rhs);
+            mult.left_child = Some(Box::new(lhs));
+            mult.right_child = Some(Box::new(rhs));
             Ok((mult, pos))
         }
         Some(&Token::OpDiv) => {
-            let mut div =
-                ParseNode::new(Symbol::NonTerminal(NonTerminal::Div), lhs.depth + 1);
-            div.children.push(lhs);
+            let mut div = ParseNode::new(NodeType::Branch,
+                                         Terminal::Div,
+                                         NonTerminal::Term,
+                                         lhs.depth + 1);
             let (rhs, pos) = parse_term(tokens, pos + 1)?;
-            div.children.push(rhs);
+            div.left_child = Some(Box::new(lhs));
+            div.right_child = Some(Box::new(rhs));
             Ok((div, pos))
         }
         _ => Ok((lhs, pos)),
@@ -210,11 +226,13 @@ fn parse_factor(tokens: &Vec<Token>, pos: usize)
     let c = tokens.get(pos);
     match c {
         Some(&Token::OpExp) => {
-            let mut exp =
-                ParseNode::new(Symbol::NonTerminal(NonTerminal::Exp), lhs.depth + 1);
-            exp.children.push(lhs);
+            let mut exp = ParseNode::new(NodeType::Branch,
+                                         Terminal::Exp,
+                                         NonTerminal::Factor,
+                                         lhs.depth + 1);
             let (rhs, pos) = parse_factor(tokens, pos + 1)?;
-            exp.children.push(rhs);
+            exp.left_child = Some(Box::new(lhs));
+            exp.right_child = Some(Box::new(rhs));
             Ok((exp, pos))
         }
         _ => Ok((lhs, pos)),
@@ -224,7 +242,7 @@ fn parse_factor(tokens: &Vec<Token>, pos: usize)
 /*
  * Lastly, exponents are parsed. If parentheses are encountered, start with
  * parsing an expression again. If a literal is found, no more recursion is
- * done because literals are parse tree terminals.
+ * done because literals are leaves in the parse tree.
  */
 fn parse_exponent(tokens: &Vec<Token>, pos: usize)
                   -> Result<(ParseNode, usize), ParserError> {
@@ -236,18 +254,21 @@ fn parse_exponent(tokens: &Vec<Token>, pos: usize)
                                    lexer: vec![] })?;
     match c {
         &Token::Number(n) => {
-            // this is a terminal/leaf, so `children' vec stays empty
-            let terminal =
-                ParseNode::new(Symbol::Terminal(Terminal::Literal(n)), 0);
-            Ok((terminal, pos + 1))
+            // this is a leaf, so left and right child keep their `None' vals
+            let leaf = ParseNode::new(NodeType::Leaf,
+                                      Terminal::Literal(n),
+                                      NonTerminal::Exponent,
+                                      0);
+            Ok((leaf, pos + 1))
         }
         &Token::LeftParen => {
             parse_expr(tokens, pos + 1).and_then(|(node, pos)| {
                 if let Some(&Token::RightParen) = tokens.get(pos) {
+                    // parentheses are not expected to be empty
                     let mut paren =
-                        ParseNode::new(Symbol::NonTerminal(NonTerminal::Paren),
+                        ParseNode::new(NodeType::Branch, Terminal::Paren, NonTerminal::Exponent,
                                        node.depth + 1);
-                    paren.children.push(node);
+                    paren.left_child = Some(Box::new(node));
                     Ok((paren, pos + 1))
                 } else {
                     Err(ParserError { msg: format!("Expected closing parenthesis but found {:?}",

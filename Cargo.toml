@@ -5,7 +5,6 @@ authors = ["DanielSchuette <d.schuette@online.de>"]
 edition = "2018"
 description = "A lexer and parser of simple arithmetic expressions."
 license = "MIT"
-license-file = "./LICENSE.md"
 repository = "https://github.com/DanielSchuette/expr_parser"
 readme = "./README.md"
 keywords = ["parser", "lexer", "ast", "interpreter", "vm"]

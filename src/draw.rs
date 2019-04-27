@@ -8,7 +8,11 @@ use std::str::from_utf8;
 
 /*
  * The following three macros are used by the graph creation functions and are
- * not exposed publicly.
+ * not exposed publicly. They determine the format of graph IDs and labels. To
+ * add non-terminal types to the graph, too, this set of macros needs to be
+ * expanded with appropriate functionality. I.e. for every node in the AST, the
+ * graph needs to have 2 nodes, one containing the non-terminal and one
+ * containing the terminal type of that AST node.
  */
 macro_rules! start_branch {
     ( $graph:expr, $ast:expr, $preamble:expr, $side:expr ) => {
@@ -50,7 +54,9 @@ macro_rules! end_branch {
  * Based on the root node of an AST, this function writes a graphviz `.gv' file
  * to `path' and if `pdf', it also creates a PDF using the `dot' utility, which
  * will be written to `path', too (only the file extension will change to
- * `.pdf').
+ * `.pdf'). Currently, only the terminal types of nodes in the graph are drawn
+ * out. Non-terminal types like `Expression' could be added quite easily,
+ * though.
  */
 pub fn create_graph(ast: &parser::ParseNode, path: &str, pdf: bool)
                     -> std::io::Result<()> {
@@ -119,14 +125,16 @@ fn create_graph_from_ast(ast: &parser::ParseNode) -> String {
 
     // add the root node to the tree and delegate interpretation
     // of the children
-    if ast.get_children().len() == 2 {
+    if let Some(lchild) = ast.get_lchild() {
         // LHS of the tree
         start_branch!(graph, ast, preamble, "root");
-        add_child(&ast.get_children()[0], &mut graph, &mut preamble, "left");
+        add_child(lchild, &mut graph, &mut preamble, "left");
 
-        // RHS of the tree
-        append_to_branch!(graph, ast, preamble, "root");
-        add_child(&ast.get_children()[1], &mut graph, &mut preamble, "right");
+        if let Some(rchild) = ast.get_rchild() {
+            // RHS of the tree
+            append_to_branch!(graph, ast, preamble, "root");
+            add_child(rchild, &mut graph, &mut preamble, "right");
+        }
     }
 
     // close the right curly braces, add the preamble and return
@@ -137,25 +145,28 @@ fn create_graph_from_ast(ast: &parser::ParseNode) -> String {
 }
 
 /*
- * FIXME: the `side' would ideally be incremented from level to level,
+ * NOTE: the `side' would ideally be incremented from level to level,
  * resulting in strings like 'rootleftleftsingleleft'. The current solution
- * still doesn't guarantee unique names for every node.
+ * still doesn't guarantee unique names for every node. A nicer solution would
+ * probably draw graph nodes based on the non-terminal types of the AST nodes.
  */
 fn add_child(ast_node: &parser::ParseNode, graph: &mut String,
              preamble: &mut String, side: &str) {
-    let children = ast_node.get_children().len();
-
-    if children == 0 {
+    if let None = ast_node.get_lchild() {
         end_branch!(graph, ast_node, preamble, side);
-    } else if children == 1 {
-        if ast_node.get_long_type().contains("Parentheses") {
-            start_branch!(graph, ast_node, preamble, side);
-            add_child(&ast_node.get_children()[0], graph, preamble, "single");
+    } else if let Some(lchild) = ast_node.get_lchild() {
+        if let None = ast_node.get_rchild() {
+            // this node has only one child, which means this must be
+            // parentheses (currently this is a somewhat dirty hack)
+            if ast_node.get_long_type().contains("Parentheses") {
+                start_branch!(graph, ast_node, preamble, side);
+                add_child(lchild, graph, preamble, "single");
+            }
+        } else if let Some(rchild) = ast_node.get_rchild() {
+            append_to_branch!(graph, ast_node, preamble, side);
+            add_child(lchild, graph, preamble, "left");
+            append_to_branch!(graph, ast_node, preamble, side);
+            add_child(rchild, graph, preamble, "right");
         }
-    } else if children == 2 {
-        append_to_branch!(graph, ast_node, preamble, side);
-        add_child(&ast_node.get_children()[0], graph, preamble, "left");
-        append_to_branch!(graph, ast_node, preamble, side);
-        add_child(&ast_node.get_children()[1], graph, preamble, "right");
     }
 }

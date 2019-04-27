@@ -24,6 +24,9 @@ expr_parser --help # validates a successful installation
 ## Create an AST Graph
 `graphviz` must be installed on your system. If you `make` and `make test`, `.gv` and `.pdf` files will be created in the project root. Refer to the `Makefile` or run `make help` for available parameters.
 
+## Direct Dependencies
+
+1. [Clap v2.33.0](https://crates.io/crates/clap)
 
 ## To-Do:
 1. execute AST via the vm's `evaluate` function

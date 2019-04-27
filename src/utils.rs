@@ -7,6 +7,10 @@ use crate::parser::{ParseNode, ParserError};
 use clap::{App, Arg};
 use std::process::exit;
 
+const VERSION: &str = "0.0.2";
+const AUTHOR: &str = "Daniel Schuette <d.schuette@online.de>";
+const ABOUT: &str = "Parse simple arithmetic expressions. Without any flags or options, an interactive session is started.";
+
 pub struct Config {
     pub expression: String,
     pub is_debug: bool,
@@ -18,9 +22,9 @@ pub struct Config {
 pub fn get_configs() -> Config {
     // define cli arguments using clap
     let cli_args =
-        App::new("Expression Parser").version("0.0.1")
-                              .author("Daniel Schuette <d.schuette@online.de>")
-                              .about("Parse simple arithmetic expressions.")
+        App::new("Expression Parser").version(VERSION)
+                              .author(AUTHOR)
+                              .about(ABOUT)
                               .arg(Arg::with_name("EXPR").short("e")
                                                          .long("expression")
                                                          .help("The expression to evaluate")
