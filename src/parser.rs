@@ -91,6 +91,8 @@ impl ParseNode {
         }
     }
 
+    /* FIXME: remove compiler directive if possible. */
+    #[allow(dead_code)]
     pub fn get_non_terminal_type(&self) -> String {
         match self.non_terminal {
             NonTerminal::Expression => format!("Expression"),

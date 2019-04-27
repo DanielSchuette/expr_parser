@@ -34,6 +34,7 @@ expr_parser --help # validates a successful installation
 1. test parser using QuickCheck or something similar
 1. allow for dynamic user input
 1. allow for variable assignment and re-use of those variables (`$var` syntax), using a stack machine
+1. FIXME: `$ls src/*.rs | xargs grep -ni 'FIXME'`
 
 ## License
 The code in this repository is MIT-licensed (see [LICENSE.md](./LICENSE.md)).
