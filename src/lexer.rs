@@ -20,6 +20,7 @@ pub enum Token {
  * token at which the error occured. A vector of tokens up to the error is
  * included for better error reporting.
  */
+#[derive(Debug)]
 pub struct LexerError {
     pub msg: String,
     pub token_no: usize,
@@ -36,7 +37,7 @@ pub fn lex(input: &String) -> Result<Vec<Token>, LexerError> {
         progress += 1;
 
         match c {
-            '0'...'9' => {
+            '0'..='9' => {
                 token_stream.next();
 
                 // pass the already consumed char and the stream to a fn that

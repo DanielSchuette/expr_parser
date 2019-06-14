@@ -3,6 +3,7 @@
  * Date:    04/26/2019
  * License: MIT
  *          (see LICENSE.md at https://github.com/DanielSchuette/expr_parser)
+ * TODO: correct the mult-div parsing error!
  */
 mod draw;
 mod lexer;
@@ -27,19 +28,26 @@ fn main() {
          * when appropriate.
          */
         let tokens = lex(&configs.expression);
+        println!("{:#?}", tokens);
         let res = parse(tokens);
 
         if let Ok(ast) = res {
             if configs.is_debug {
-                println!("{:#?}", ast);
+                eprintln!("{}: {:#?}", configs.progname, ast);
             }
             if configs.make_graph {
                 utils::draw(&ast, &configs.graph_file, true);
             }
             let res = vm::evaluate(&ast);
-            println!("Expression result: {}", res);
+
+            // TODO: clean this code up
+            if let Ok(res) = res {
+                eprintln!("{}: Expression result = {}.", configs.progname, res);
+            } else if let Err(e) = res {
+                eprintln!("{}: error: {}", configs.progname, e);
+            }
         } else if let Err(e) = res {
-            exit_with_err(e, &configs.expression);
+            exit_with_err(e, &configs.expression, 1);
         }
 
         exit(0);
@@ -47,5 +55,5 @@ fn main() {
 
     // delegate IO, lexing & parsing, and evaluation of a resulting AST to the
     // virtual machine
-    vm::run();
+    vm::run(&configs);
 }

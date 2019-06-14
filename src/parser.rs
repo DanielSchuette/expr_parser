@@ -3,7 +3,7 @@ use crate::lexer;
 use lexer::*;
 
 /*
- * Every symbol in the language except for integer literals and operators is a
+ * Every symbol in the language except for integer literals and operators are
  * non-terminals. They appear as `ParseNode.kind' in the syntax tree. Leaf
  * nodes of the tree only store the corresponding terminal with its `i64' value
  * while branch nodes store their non-terminal, too.
@@ -17,7 +17,7 @@ enum NonTerminal {
 }
 
 #[derive(Debug)]
-enum Terminal {
+pub enum Terminal {
     Sum,          /* summation */
     Sub,          /* subtraction */
     Mod,          /* modulo */
@@ -41,7 +41,7 @@ pub struct ParseNode {
     left_child: Option<Box<ParseNode>>, /* `None' for terminals */
     right_child: Option<Box<ParseNode>>, /* `None' for terminals & parens */
     ntype: NodeType,                    /* type of this node in the AST */
-    terminal: Terminal,                 /* */
+    pub terminal: Terminal,             /* the terminal type of this node */
     non_terminal: NonTerminal,          /* `IsTerminal' for terminals */
     depth: usize,                       /* depth of this node (leaf=0) */
 }
@@ -91,7 +91,6 @@ impl ParseNode {
         }
     }
 
-    /* FIXME: remove compiler directive if possible. */
     #[allow(dead_code)]
     pub fn get_non_terminal_type(&self) -> String {
         match self.non_terminal {

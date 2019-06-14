@@ -10,12 +10,14 @@ use std::process::exit;
 const VERSION: &str = "0.0.2";
 const AUTHOR: &str = "Daniel Schuette <d.schuette@online.de>";
 const ABOUT: &str = "Parse simple arithmetic expressions. Without any flags or options, an interactive session is started.";
+const PROGNAME: &str = "expr_parser";
 
 pub struct Config {
     pub expression: String,
     pub is_debug: bool,
     pub make_graph: bool,
     pub graph_file: String,
+    pub progname: String,
 }
 
 /* Parse CLi arguments and return them, wrapped in a `Config' struct. */
@@ -75,27 +77,37 @@ pub fn get_configs() -> Config {
     Config { expression,
              is_debug,
              make_graph,
-             graph_file }
+             graph_file,
+             progname: PROGNAME.to_string() }
 }
 
 /*
- * Prints a helpful error msg, based on the `ParserError' and the user `input'
- * and exits with a status of 1.
+ * Prints a helpful error msg, based on the `ParserError' and the user `input'.
  */
-pub fn exit_with_err(err: ParserError, input: &String) {
+pub fn report_parser_err(err: ParserError, input: &String) {
     // report the error back to the user
-    println!("Token {}: {}.", err.token_no, err.msg);
-    println!("\t{}", input);
+    eprintln!("Token {}: {}.", err.token_no, err.msg);
+    eprintln!("\t{}", input);
 
     // print an indicator where in the input the error happened
     if err.lexer.len() != 0 {
         let indicator = "-".repeat(get_position(err.lexer));
-        println!("\t{}^", indicator);
+        eprintln!("\t{}^", indicator);
     } else {
-        let indicator = "-".repeat(input.to_string().len() - 1);
-        println!("\t{}^", indicator);
+        let input_len = input.to_string().len();
+        if input_len > 1 {
+            let indicator = "-".repeat(input_len - 1);
+            eprintln!("\t{}^", indicator);
+        } else {
+            eprintln!("\t^");
+        }
     }
-    exit(1);
+}
+
+/* Wraps `report_parser_err' and exits with the indicated status code. */
+pub fn exit_with_err(err: ParserError, input: &String, code: i32) {
+    report_parser_err(err, &input);
+    exit(code);
 }
 
 fn get_position(vec: Vec<Token>) -> usize {
@@ -117,7 +129,7 @@ fn get_position(vec: Vec<Token>) -> usize {
 pub fn draw(ast: &ParseNode, path: &str, pdf: bool) {
     let res = draw::create_graph(&ast, path, pdf);
     match res {
-        Ok(_) => println!("Successfully wrote graph data to file."),
-        Err(e) => println!("Failed to create graph: {}.", e),
+        Ok(_) => eprintln!("Successfully wrote graph data to file."),
+        Err(e) => eprintln!("Failed to create graph: {}.", e),
     }
 }
