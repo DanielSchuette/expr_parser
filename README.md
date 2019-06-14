@@ -36,5 +36,8 @@ expr_parser --help # validates a successful installation
 1. allow for variable assignment and re-use of those variables (`$var` syntax), using a stack machine
 1. FIXME: `$ls src/*.rs | xargs grep -ni 'FIXME'`
 
+## Known Bugs
+At this point in development, the parser is (unfortunately) quite buggy. It works with simple expressions, but it parses with right-associativity when `>= 1` token of the same level of precendence appear on the same line. This bug will be fixed soon, though (with a complete rewrite of a top-down, recursive descent parser).
+
 ## License
 The code in this repository is MIT-licensed (see [LICENSE.md](./LICENSE.md)).

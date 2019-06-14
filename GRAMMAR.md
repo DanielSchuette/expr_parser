@@ -1,7 +1,7 @@
 # Grammar
 
 ## Overview
-A [reference](http://pages.cs.wisc.edu/~fischer/cs536.s08/course.hold/html/NOTES/3.CFG.html#exp).
+An excellent [reference](https://compilers.iecc.com/crenshaw/tutor1.txt).
 
 These *symbols* are recognized by the parser:
 

@@ -1,4 +1,9 @@
-/* parser.rs: The parser. */
+/* parser.rs: The parser.
+ * FIXME: the parser has one severe bug (it parses expressions in a right-
+ *        associative way), so expressions without parentheses are *not*
+ *        parsed correctly.
+ */
+
 use crate::lexer;
 use lexer::*;
 
@@ -125,10 +130,10 @@ pub fn parse(tokens: Result<Vec<Token>, LexerError>)
     match tokens {
         Ok(tokens) => {
             // parse from right to left to preserve left-associativity of operations
-            parse_expr(&tokens, tokens.len()-1).and_then(|(mut node, pos)| {
+            parse_expr(&tokens, 0).and_then(|(mut node, pos)| {
                 // check if all tokens were consumed and append the parsing
                 // result to a root node
-                if pos == 0 {
+                if pos == tokens.len() {
                     node.ntype = NodeType::Root;
                     Ok(node)
                 } else {
@@ -159,7 +164,7 @@ fn parse_expr(tokens: &Vec<Token>, pos: usize)
                                          Terminal::Sum,
                                          NonTerminal::Expression,
                                          lhs.depth + 1);
-            let (rhs, pos) = parse_expr(tokens, pos - 1)?;
+            let (rhs, pos) = parse_expr(tokens, pos + 1)?;
             sum.left_child = Some(Box::new(lhs));
             sum.right_child = Some(Box::new(rhs));
             Ok((sum, pos))
@@ -169,7 +174,7 @@ fn parse_expr(tokens: &Vec<Token>, pos: usize)
                                          Terminal::Sub,
                                          NonTerminal::Expression,
                                          lhs.depth + 1);
-            let (rhs, pos) = parse_expr(tokens, pos - 1)?;
+            let (rhs, pos) = parse_expr(tokens, pos + 1)?;
             sub.left_child = Some(Box::new(lhs));
             sub.right_child = Some(Box::new(rhs));
             Ok((sub, pos))
@@ -179,7 +184,7 @@ fn parse_expr(tokens: &Vec<Token>, pos: usize)
                                         Terminal::Mod,
                                         NonTerminal::Expression,
                                         lhs.depth + 1);
-            let (rhs, pos) = parse_expr(tokens, pos - 1)?;
+            let (rhs, pos) = parse_expr(tokens, pos + 1)?;
             md.left_child = Some(Box::new(lhs));
             md.right_child = Some(Box::new(rhs));
             Ok((md, pos))
@@ -202,7 +207,7 @@ fn parse_term(tokens: &Vec<Token>, pos: usize)
                                           Terminal::Mult,
                                           NonTerminal::Term,
                                           lhs.depth + 1);
-            let (rhs, pos) = parse_term(tokens, pos - 1)?;
+            let (rhs, pos) = parse_term(tokens, pos + 1)?;
             mult.left_child = Some(Box::new(lhs));
             mult.right_child = Some(Box::new(rhs));
             Ok((mult, pos))
@@ -212,7 +217,7 @@ fn parse_term(tokens: &Vec<Token>, pos: usize)
                                          Terminal::Div,
                                          NonTerminal::Term,
                                          lhs.depth + 1);
-            let (rhs, pos) = parse_term(tokens, pos - 1)?;
+            let (rhs, pos) = parse_term(tokens, pos + 1)?;
             div.left_child = Some(Box::new(lhs));
             div.right_child = Some(Box::new(rhs));
             Ok((div, pos))
@@ -232,7 +237,7 @@ fn parse_factor(tokens: &Vec<Token>, pos: usize)
                                          Terminal::Exp,
                                          NonTerminal::Factor,
                                          lhs.depth + 1);
-            let (rhs, pos) = parse_factor(tokens, pos - 1)?;
+            let (rhs, pos) = parse_factor(tokens, pos + 1)?;
             exp.left_child = Some(Box::new(lhs));
             exp.right_child = Some(Box::new(rhs));
             Ok((exp, pos))
@@ -261,21 +266,17 @@ fn parse_exponent(tokens: &Vec<Token>, pos: usize)
                                       Terminal::Literal(n),
                                       NonTerminal::Exponent,
                                       0);
-            Ok((leaf, pos - 1))
+            Ok((leaf, pos + 1))
         }
-        &Token::RightParen => {
-            parse_expr(tokens, pos - 1).and_then(|(node, pos)| {
-                if let Some(&Token::LeftParen) = tokens.get(pos) {
+        &Token::LeftParen => {
+            parse_expr(tokens, pos + 1).and_then(|(node, pos)| {
+                if let Some(&Token::RightParen) = tokens.get(pos) {
                     // parentheses are not expected to be empty
                     let mut paren =
                         ParseNode::new(NodeType::Branch, Terminal::Paren, NonTerminal::Exponent,
                                        node.depth + 1);
                     paren.left_child = Some(Box::new(node));
-                    if pos == 0 {
-                        Ok((paren, pos))
-                    } else {
-                        Ok((paren, pos-1))
-                    }
+                    Ok((paren, pos+1))
                 } else {
                     Err(ParserError { msg: format!("Expected closing parenthesis but found {:?}",
                                 tokens.get(pos-1)), token_no: pos, lexer: vec![] })
