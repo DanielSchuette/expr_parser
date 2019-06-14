@@ -1,0 +1,184 @@
+    Finished dev [unoptimized + debuginfo] target(s) in 0.02s
+expr_parser: ParseNode {
+    left_child: Some(
+        ParseNode {
+            left_child: Some(
+                ParseNode {
+                    left_child: Some(
+                        ParseNode {
+                            left_child: Some(
+                                ParseNode {
+                                    left_child: Some(
+                                        ParseNode {
+                                            left_child: Some(
+                                                ParseNode {
+                                                    left_child: Some(
+                                                        ParseNode {
+                                                            left_child: None,
+                                                            right_child: None,
+                                                            ntype: Leaf,
+                                                            terminal: Literal(
+                                                                18,
+                                                            ),
+                                                            non_terminal: Exponent,
+                                                            depth: 0,
+                                                        },
+                                                    ),
+                                                    right_child: None,
+                                                    ntype: Branch,
+                                                    terminal: NonTerminal,
+                                                    non_terminal: Factor,
+                                                    depth: 0,
+                                                },
+                                            ),
+                                            right_child: None,
+                                            ntype: Branch,
+                                            terminal: NonTerminal,
+                                            non_terminal: Term,
+                                            depth: 0,
+                                        },
+                                    ),
+                                    right_child: Some(
+                                        ParseNode {
+                                            left_child: Some(
+                                                ParseNode {
+                                                    left_child: Some(
+                                                        ParseNode {
+                                                            left_child: None,
+                                                            right_child: None,
+                                                            ntype: Leaf,
+                                                            terminal: Literal(
+                                                                6,
+                                                            ),
+                                                            non_terminal: Exponent,
+                                                            depth: 1,
+                                                        },
+                                                    ),
+                                                    right_child: None,
+                                                    ntype: Branch,
+                                                    terminal: NonTerminal,
+                                                    non_terminal: Factor,
+                                                    depth: 1,
+                                                },
+                                            ),
+                                            right_child: None,
+                                            ntype: Branch,
+                                            terminal: NonTerminal,
+                                            non_terminal: Term,
+                                            depth: 1,
+                                        },
+                                    ),
+                                    ntype: Branch,
+                                    terminal: NonTerminal,
+                                    non_terminal: Expression,
+                                    depth: 0,
+                                },
+                            ),
+                            right_child: None,
+                            ntype: Branch,
+                            terminal: Paren,
+                            non_terminal: Exponent,
+                            depth: 0,
+                        },
+                    ),
+                    right_child: None,
+                    ntype: Branch,
+                    terminal: NonTerminal,
+                    non_terminal: Factor,
+                    depth: 0,
+                },
+            ),
+            right_child: Some(
+                ParseNode {
+                    left_child: Some(
+                        ParseNode {
+                            left_child: Some(
+                                ParseNode {
+                                    left_child: Some(
+                                        ParseNode {
+                                            left_child: None,
+                                            right_child: None,
+                                            ntype: Leaf,
+                                            terminal: Literal(
+                                                61,
+                                            ),
+                                            non_terminal: Exponent,
+                                            depth: 2,
+                                        },
+                                    ),
+                                    right_child: None,
+                                    ntype: Branch,
+                                    terminal: NonTerminal,
+                                    non_terminal: Factor,
+                                    depth: 2,
+                                },
+                            ),
+                            right_child: None,
+                            ntype: Leaf,
+                            terminal: Literal(
+                                50,
+                            ),
+                            non_terminal: Exponent,
+                            depth: 1,
+                        },
+                    ),
+                    right_child: None,
+                    ntype: Branch,
+                    terminal: NonTerminal,
+                    non_terminal: Factor,
+                    depth: 1,
+                },
+            ),
+            ntype: Branch,
+            terminal: NonTerminal,
+            non_terminal: Term,
+            depth: 0,
+        },
+    ),
+    right_child: Some(
+        ParseNode {
+            left_child: Some(
+                ParseNode {
+                    left_child: Some(
+                        ParseNode {
+                            left_child: None,
+                            right_child: None,
+                            ntype: Leaf,
+                            terminal: Literal(
+                                4,
+                            ),
+                            non_terminal: Exponent,
+                            depth: 1,
+                        },
+                    ),
+                    right_child: Some(
+                        ParseNode {
+                            left_child: None,
+                            right_child: None,
+                            ntype: Leaf,
+                            terminal: Literal(
+                                2,
+                            ),
+                            non_terminal: Exponent,
+                            depth: 2,
+                        },
+                    ),
+                    ntype: Branch,
+                    terminal: NonTerminal,
+                    non_terminal: Factor,
+                    depth: 1,
+                },
+            ),
+            right_child: None,
+            ntype: Branch,
+            terminal: NonTerminal,
+            non_terminal: Term,
+            depth: 1,
+        },
+    ),
+    ntype: Branch,
+    terminal: NonTerminal,
+    non_terminal: Expression,
+    depth: 0,
+}
+Successfully wrote graph data to file.

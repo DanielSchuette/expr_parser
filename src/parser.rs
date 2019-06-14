@@ -298,13 +298,9 @@ fn exponent(stream: &mut TokenStream, depth: usize)
     match token {
         Token::LeftParen => {
             stream.advance(1);
-            let mut paren_node = ParseNode::new(NodeType::Branch,
-                                                Terminal::Paren,
-                                                NonTerminal::Exponent,
-                                                depth);
-            let child = expression(stream, depth)?; /* parse rest of parenthesized expression */
-            paren_node.left_child = Some(Box::new(child));
-            node.left_child = Some(Box::new(paren_node));
+            node.terminal = Terminal::Paren;
+            let lchild = expression(stream, depth)?; /* parse rest of parenthesized expression */
+            node.left_child = Some(Box::new(lchild));
             if let Token::RightParen = stream.get_current() {
                 stream.advance(1);
             } else {
@@ -316,11 +312,8 @@ fn exponent(stream: &mut TokenStream, depth: usize)
         }
         Token::Number(i) => {
             stream.advance(1);
-            let literal_node = ParseNode::new(NodeType::Leaf,
-                                              Terminal::Literal(i),
-                                              NonTerminal::Exponent,
-                                              depth);
-            node.left_child = Some(Box::new(literal_node));
+            node.ntype = NodeType::Leaf;
+            node.terminal = Terminal::Literal(i);
         }
         _ => {
             return Err(ParserError::new("Unexpected end of input".to_string(),
