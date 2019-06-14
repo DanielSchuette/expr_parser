@@ -78,7 +78,7 @@ pub fn evaluate(node: &ParseNode) -> Result<i64, String> {
                             }
                             Terminal::Div => {
                                 if *n == 0 {
-                                    return Err(String::from("Divison by 0"));
+                                    return Err(String::from("vm: Divison by 0"));
                                 }
                                 result /= n;
                             }
@@ -86,6 +86,7 @@ pub fn evaluate(node: &ParseNode) -> Result<i64, String> {
                                 result = result.pow(*n as u32);
                             }
                             Terminal::Paren => continue, /* parens are ignored */
+                            Terminal::NonTerminal => continue, /* FIXME: non-terminals are ignored */
                             Terminal::Literal(n) => {
                                 return Err(String::from(
                                         format!("vm: Unexpected integer literal {}", n)
@@ -94,7 +95,7 @@ pub fn evaluate(node: &ParseNode) -> Result<i64, String> {
                         }
                     }
                     _ => {
-                        return Err(String::from("Expected integer literal"));
+                        return Err(String::from("vm: Expected integer literal"));
                     }
                 }
             }

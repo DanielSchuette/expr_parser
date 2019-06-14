@@ -5,6 +5,8 @@
  *          (see LICENSE.md at https://github.com/DanielSchuette/expr_parser)
  * TODO: correct the mult-div parsing error!
  */
+#![allow(dead_code)]
+#![allow(unused_imports)]
 mod draw;
 mod lexer;
 mod parser;
@@ -37,14 +39,17 @@ fn main() {
             if configs.make_graph {
                 utils::draw(&ast, &configs.graph_file, true);
             }
-            let res = vm::evaluate(&ast);
 
-            // TODO: clean this code up
-            if let Ok(res) = res {
-                eprintln!("{}: Expression result = {}.", configs.progname, res);
-            } else if let Err(e) = res {
-                eprintln!("{}: error: {}", configs.progname, e);
-            }
+        /*
+        let res = vm::evaluate(&ast);
+
+        // TODO: clean this code up
+        if let Ok(res) = res {
+            eprintln!("{}: Expression result = {}.", configs.progname, res);
+        } else if let Err(e) = res {
+            eprintln!("{}: error: {}", configs.progname, e);
+        }
+        */
         } else if let Err(e) = res {
             exit_with_err(e, &configs.expression, 1);
         }
