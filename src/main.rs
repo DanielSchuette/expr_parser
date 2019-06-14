@@ -28,7 +28,6 @@ fn main() {
          * when appropriate.
          */
         let tokens = lex(&configs.expression);
-        println!("{:#?}", tokens);
         let res = parse(tokens);
 
         if let Ok(ast) = res {

@@ -12,10 +12,10 @@ literal * / ^ + - %
 The *context-free grammar* is constructed from highest to lowest precedence, i.e. following mathematics:
 
 ```
-expr     --> expr + expr     | expr - expr   | expr % expr   | term
-term     --> term * term     | term / term   | factor
-factor   --> factor ^ factor | exponent
-exponent --> INT_LITERAL     | ( expr )
+expr     --> expr + term       | expr - term   | expr % term   | term
+term     --> term * factor     | term / factor | factor
+factor   --> factor ^ exponent | exponent
+exponent --> int_literal       | ( expr )
 ```
 
 ## Program logic
