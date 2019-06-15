@@ -18,6 +18,20 @@ factor   --> factor ^ exponent | exponent
 exponent --> int_literal       | ( expr )
 ```
 
+Another possible grammar could be:
+```
+PROG: RULE
+RULE: EXPR { {+|-|%} EXPR }
+    | EXPR
+EXPR: TERM { {*|/} TERM }
+    | TERM
+TERM: EXPO ^ EXPO
+    | EXP
+EXPO: literal
+    | ( RULE )
+
+```
+
 ## Program logic
 1. Lexing -> take a string and returns a vector of tokens
 1. Parsing -> turn tokens into an executable *abstract syntax tree*, from lowest to highest precedence (`parse_expr` -> `parse_term` -> `parse_factor` -> `parse_exponent` (which might recurse to `parse_expr`)
